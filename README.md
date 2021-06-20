@@ -1,4 +1,4 @@
-# kmk-to-qmk-translator
+#qmk-to-kmk-translator
 This was a quick and dirty hack to speed up keymap dev while using KMK firmware.
 Ther is only one keyboard class created so far, and it will work for the atreus62.
 I do plan on creating more classes as my projects require, but also look forward 
