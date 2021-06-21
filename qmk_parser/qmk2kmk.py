@@ -43,6 +43,16 @@ class Translator:
         'KC_8'    : 'KC.N8',
         'KC_9'    : 'KC.N9',
         'KC_0'    : 'KC.N0',
+        'KC_P1'    : 'KC.P1',
+        'KC_P2'    : 'KC.P2',
+        'KC_P3'    : 'KC.P3',
+        'KC_P4'    : 'KC.P4',
+        'KC_P5'    : 'KC.P5',
+        'KC_P6'    : 'KC.P6',
+        'KC_P7'    : 'KC.P7',
+        'KC_P8'    : 'KC.P8',
+        'KC_P9'    : 'KC.P9',
+        'KC_P0'    : 'KC.P0',
         'KC_A'    : 'KC.A',
         'KC_B'    : 'KC.B',
         'KC_C'    : 'KC.C',
@@ -139,6 +149,11 @@ class Translator:
         'KC_F12'  : 'KC.F12',
         'KC_F13'  : 'KC.F13',
         'RESET'   : 'KC.RESET',
+        'KC_CAPS' : 'KC.CAPS',
+        'KC_HASH' : 'KC.HASH',
+        'KC_AT'   : 'KC.AT',
+        'KC_DLR'  : 'KC.DLR',
+        'KC_PERC' : 'KC.PERC',
     }
 
     def __init__(self, qmk_file, keyboard, debug=False):
@@ -163,9 +178,16 @@ class Translator:
                     else:
                         # where ther is a valid index in the json, put it in the
                         # correct place in the kmk keymap
-                        layer_list.append(
-                            self.key_lookup[data['layers'][layer][key]]
-                            )
+                        if 'ANY' in data['layers'][layer][key]:
+                            newkey = data['layers'][layer][key].split('(')
+                            newkey = newkey[1].split(')')[0]
+                            layer_list.append(
+                                newkey
+                                )
+                        else:
+                            layer_list.append(
+                                self.key_lookup[data['layers'][layer][key]]
+                                )
                 # add the layer to our new list of layers
                 self.keymap.append(layer_list)
         # produce a kmk keymap that can be pasted into our main.py
@@ -180,16 +202,18 @@ class Translator:
         count = 0
         print('keyboard.keymap = [')
         for layer in self.keymap:
-            print('\t[')
+            print('    [')
             for idx,key in enumerate(layer):
                 if count <= self.keyboard.cols - 1:
-                    line += f'{key},'
+                    line += f'{key}, '
+                    for s in range(9-len(key)):
+                        line += ' '
                     count += 1
                 if count > self.keyboard.cols - 1:
-                    print(f'\t\t{line}')
+                    print(f'        {line}')
                     line = ''
                     count = 0
-            print('\t],')
+            print('    ],')
         print(']')
 
 # usage - path to json file as the only argument
