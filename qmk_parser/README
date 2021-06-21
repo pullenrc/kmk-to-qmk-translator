@@ -1,1 +1,2 @@
-hi
+Parser is not complete, but works pretty well in it's fragile state.  The json file in here is my current keymap for the qmk configurator website, and it gets 
+translated with no errors.  More robustness coming soon.
