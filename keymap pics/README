@@ -1,0 +1,54 @@
+These are pics of my keymap designed on the qmk configurator website, put here to illustrate how to get custom keys to be translated with as little work as possible.
+Step 1: make your design your custom keys in your main.py for KMK, see example below:
+' 
+custom keys
+NEW = KC.LCTL(KC.N)
+NEW_DIR = KC.LCTL(KC.LSFT(KC.N))
+CAD = KC.LCTL(KC.LALT(KC.DEL))
+RES = KC.LCTL(KC.LSFT(KC.ESC))
+FE = KC.LGUI(KC.E)
+LT1_DEL = KC.LT(1,KC.DEL)
+LT2_ENT = KC.LT(2, KC.ENT)
+SAVE_AS = KC.LCTL(KC.LSFT(KC.S))
+PSCR = KC.LGUI(KC.PSCR)
+SNIP = simple_key_sequence(
+    (
+    KC.LGUI,
+    KC.MACRO_SLEEP_MS(25),
+    KC.S,
+    KC.N,
+    KC.I,
+    KC.P,
+    KC.MACRO_SLEEP_MS(25),
+    KC.ENT
+    )
+'
+Then where every you want those keys in your keymap, place and ANY key in that position, with the text of your custom keys. The output looks like this:
+'
+keyboard.keymap = [                                                                                                                                     
+    [                                                                                                                                                       
+        KC.ESC,    KC.N1,     KC.N2,     KC.N3,     KC.N4,     KC.N5,     KC.N6,     KC.N7,     KC.N8,     KC.N9,     KC.N0,     KC.MINS,                   
+        KC.CAPS,   KC.Q,      KC.W,      KC.E,      KC.R,      KC.T,      KC.Y,      KC.U,      KC.I,      KC.O,      KC.P,      KC.PSLS,                   
+        KC.TAB,    KC.A,      KC.S,      KC.D,      KC.F,      KC.G,      KC.H,      KC.J,      KC.K,      KC.L,      KC.SCLN,   KC.QUOT,                   
+        CAD,       KC.Z,      KC.X,      KC.C,      KC.V,      KC.B,      KC.N,      KC.M,      KC.COMM,   KC.DOT,    KC.SLSH,   FE,                        
+        KC.BSPC,   KC.DEL,    KC.LALT,   KC.LALT,   KC.LCTL,   KC.BSPC,   KC.SPC,    KC.ENT,    KC.LALT,   KC.LCTL,   KC.ENT,    KC.RGUI,                   
+        XXXXXXX,   XXXXXXX,   XXXXXXX,   XXXXXXX,   XXXXXXX,   KC.MO(1),  KC.MO(2),  XXXXXXX,   XXXXXXX,   XXXXXXX,   XXXXXXX,   XXXXXXX,               
+    ],                                                                                                                                                  
+    [                                                                                                                                                       
+        RES,       SAVE_AS,   PSCR,      SNIP,      KC.LGUI,   NEW_DIR,   KC.PSLS,   KC.RGUI,   KC.NO,     KC.NO,     KC.NO,     KC.MINS,                   
+        KC.BSLS,   KC.NO,     KC.NO,     KC.UP,     KC.NO,     NEW,       KC.PAST,   KC.P7,     KC.P8,     KC.P9,     KC.NO,     KC.BSLS,                   
+        KC.F2,     KC.NO,     KC.LEFT,   KC.DOWN,   KC.RGHT,   KC.HASH,   KC.PPLS,   KC.P4,     KC.P5,     KC.P6,     KC.NO,     KC.QUOT,                   
+        KC.LALT,   KC.NO,     KC.NO,     KC.NO,     KC.TAB,    KC.UNDS,   KC.MINS,   KC.P1,     KC.P2,     KC.P3,     KC.NO,     KC.LBRC,                   
+        KC.BSPC,   KC.NO,     KC.NO,     KC.NO,     KC.NO,     KC.TRNS,   KC.SPC,    KC.EQL,    KC.P0,     KC.DOT,    KC.ENT,    KC.RGUI,                   
+        XXXXXXX,   XXXXXXX,   XXXXXXX,   XXXXXXX,   XXXXXXX,   KC.TRNS,   KC.TRNS,   XXXXXXX,   XXXXXXX,   XXXXXXX,   XXXXXXX,   XXXXXXX,               
+    ],                                                                                                                                                  
+    [                                                                                                                                                       
+        RES,       KC.NO,     KC.NO,     KC.NO,     KC.NO,     KC.NO,     DEBUG_WL,  PRINT,     SAVE_AS,   KC.NO,     KC.NO,     KC.NO,                     
+        KC.BSLS,   KC.NO,     KC.NO,     KC.LCBR,   KC.RCBR,   KC.AT,     INT,       PUBLIC,    GET_SET,   KC.NO,     KC.NO,     KC.NO,                     
+        KC.TAB,    KC.NO,     KC.NO,     KC.LPRN,   KC.RPRN,   KC.DLR,    BOOL,      DOUBLE,    KC.NO,     KC.NO,     KC.NO,     KC.NO,                     
+        KC.LALT,   KC.NO,     KC.NO,     KC.LBRC,   KC.LBRC,   KC.PERC,   UINT,      BYTE,      KC.NO,     KC.NO,     KC.NO,     KC.NO,                     
+        KC.BSPC,   KC.LGUI,   KC.LALT,   KC.LALT,   KC.LCTL,   KC.DEL,    KC.TRNS,   KC.EQL,    KC.LCTL,   KC.LALT,   KC.ENT,    KC.RESET,                 
+        XXXXXXX,   XXXXXXX,   XXXXXXX,   XXXXXXX,   XXXXXXX,   KC.TRNS,   KC.TRNS,   XXXXXXX,   XXXXXXX,   XXXXXXX,   XXXXXXX,   XXXXXXX,               
+    ],                                                                                                                                           
+] 
+'
