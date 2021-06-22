@@ -29,8 +29,10 @@ class Atreus62:
 class Translator:
     
     debug = False
-    keymap = [] 
-    # this was a quick and dirty lookup dict that fit my purpouse for the 
+    keymap = []  
+    keyslot = 9
+    tab = '    '
+    # this was a quick and dirty lookup dict that fit my purpouse for the
     # atreus62.  Please expand for your needs
     key_lookup = {
         'KC_1'    : 'KC.N1',
@@ -43,16 +45,16 @@ class Translator:
         'KC_8'    : 'KC.N8',
         'KC_9'    : 'KC.N9',
         'KC_0'    : 'KC.N0',
-        'KC_P1'    : 'KC.P1',
-        'KC_P2'    : 'KC.P2',
-        'KC_P3'    : 'KC.P3',
-        'KC_P4'    : 'KC.P4',
-        'KC_P5'    : 'KC.P5',
-        'KC_P6'    : 'KC.P6',
-        'KC_P7'    : 'KC.P7',
-        'KC_P8'    : 'KC.P8',
-        'KC_P9'    : 'KC.P9',
-        'KC_P0'    : 'KC.P0',
+        'KC_P1'   : 'KC.P1',
+        'KC_P2'   : 'KC.P2',
+        'KC_P3'   : 'KC.P3',
+        'KC_P4'   : 'KC.P4',
+        'KC_P5'   : 'KC.P5',
+        'KC_P6'   : 'KC.P6',
+        'KC_P7'   : 'KC.P7',
+        'KC_P8'   : 'KC.P8',
+        'KC_P9'   : 'KC.P9',
+        'KC_P0'   : 'KC.P0',
         'KC_A'    : 'KC.A',
         'KC_B'    : 'KC.B',
         'KC_C'    : 'KC.C',
@@ -89,12 +91,12 @@ class Translator:
         'KC_LCTL' : 'KC.LCTL',
         'KC_LGUI' : 'KC.LGUI',
         'KC_LALT' : 'KC.LALT',
-        'KC_LSFT' : 'KC.LALT',
-        'KC_RBRC' : 'KC.LBRC',
-        'KC_RCTL' : 'KC.LCTL',
-        'KC_RGUI' : 'KC.LGUI',
-        'KC_RALT' : 'KC.LALT',
-        'KC_RSFT' : 'KC.LALT',
+        'KC_LSFT' : 'KC.LSFT',
+        'KC_RBRC' : 'KC.RBRC',
+        'KC_RCTL' : 'KC.RCTL',
+        'KC_RGUI' : 'KC.RGUI',
+        'KC_RALT' : 'KC.RALT',
+        'KC_RSFT' : 'KC.RSFT',
         'KC_GRV'  : 'KC.GRV',
         'KC_BSPC' : 'KC.BSPC',
         'KC_DEL'  : 'KC.DEL',
@@ -123,18 +125,6 @@ class Translator:
         'KC_SCLN' : 'KC.SCLN',
         'KC_RGHT' : 'KC.RGHT',
         'KC_PGDN' : 'KC.PGDN',
-        'MO(0)'   : 'KC.MO(0)',
-        'MO(1)'   : 'KC.MO(1)',
-        'MO(2)'   : 'KC.MO(2)',
-        'MO(3)'   : 'KC.MO(3)',
-        'MO(4)'   : 'KC.MO(4)',
-        'MO(5)'   : 'KC.MO(5)',
-        'TO(0)'   : 'KC.TO(0)',
-        'TO(1)'   : 'KC.TO(1)',
-        'TO(2)'   : 'KC.TO(2)',
-        'TO(3)'   : 'KC.TO(3)',
-        'TO(4)'   : 'KC.TO(4)',
-        'TO(5)'   : 'KC.TO(5)',
         'KC_F1'   : 'KC.F1',
         'KC_F2'   : 'KC.F2',
         'KC_F3'   : 'KC.F3',
@@ -161,6 +151,31 @@ class Translator:
         self.keyboard = keyboard
         self.debug = debug
 
+    def parse_anykey(self, key):
+        newkey = key.split('(')
+        newkey = newkey[1].split(')')[0]
+        return newkey
+
+    def parse_mo(self, key):
+        return f'KC.MO({self.split_key(key)})'
+
+    def parse_to(self, key):
+        return f'KC.TO({self.split_key(key)})'
+
+    def parse_tt(self, key):
+        return f'KC.TT({self.split_key(key)})'
+
+    def parse_tg(self, key):
+        return f'KC.TG({self.split_key(key)})'
+
+    def parse_df(self, key):
+        return f'KC.DF({self.split_key(key)})'
+    
+    def split_key(self, key):
+        newkey = key.split('(')
+        newkey = newkey[1].split(')')[0]
+        return newkey
+
     def parse(self):
         # read in info.json form qmk configurator download
         with open(self.qmk_file,'r') as f:
@@ -179,10 +194,28 @@ class Translator:
                         # where ther is a valid index in the json, put it in the
                         # correct place in the kmk keymap
                         if 'ANY' in data['layers'][layer][key]:
-                            newkey = data['layers'][layer][key].split('(')
-                            newkey = newkey[1].split(')')[0]
                             layer_list.append(
-                                newkey
+                                self.parse_anykey(data['layers'][layer][key])
+                                )
+                        elif 'MO(' in data['layers'][layer][key]:
+                            layer_list.append(
+                                self.parse_mo(data['layers'][layer][key])
+                                )
+                        elif 'TO(' in data['layers'][layer][key]:
+                            layer_list.append(
+                                self.parse_to(data['layers'][layer][key])
+                                )
+                        elif 'TT(' in data['layers'][layer][key]:
+                            layer_list.append(
+                                self.parse_tt(data['layers'][layer][key])
+                                )
+                        elif 'TG(' in data['layers'][layer][key]:
+                            layer_list.append(
+                                self.parse_tg(data['layers'][layer][key])
+                                )
+                        elif 'DF(' in data['layers'][layer][key]:
+                            layer_list.append(
+                                self.parse_tf(data['layers'][layer][key])
                                 )
                         else:
                             layer_list.append(
@@ -202,18 +235,18 @@ class Translator:
         count = 0
         print('keyboard.keymap = [')
         for layer in self.keymap:
-            print('    [')
+            print(f'{self.tab}[')
             for idx,key in enumerate(layer):
                 if count <= self.keyboard.cols - 1:
                     line += f'{key}, '
-                    for s in range(9-len(key)):
+                    for s in range(self.keyslot-len(key)):
                         line += ' '
                     count += 1
                 if count > self.keyboard.cols - 1:
-                    print(f'        {line}')
+                    print(f'{self.tab*2}{line}')
                     line = ''
                     count = 0
-            print('    ],')
+            print(f'{self.tab}],')
         print(']')
 
 # usage - path to json file as the only argument
