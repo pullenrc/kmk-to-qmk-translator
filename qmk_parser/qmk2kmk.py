@@ -25,12 +25,21 @@ class Atreus62:
         -1, -1, -1, -1, -1, 54, 55 , -1,-1, -1, -1, -1
     ]
 
+class Dactyl4x6:
+    rows = 4
+    cols = 12
+    matrix = [
+        0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10,  11,
+        12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+        24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+        -2, -2, -2, 36, 37, 38, 39, 40, 41, -2, -2, -2
+    ]
 
 class Translator:
     
     debug = False
     keymap = []  
-    keyslot = 9
+    keyslot = 12
     tab = '    '
     # this was a quick and dirty lookup dict that fit my purpouse for the
     # atreus62.  Please expand for your needs
@@ -144,6 +153,21 @@ class Translator:
         'KC_AT'   : 'KC.AT',
         'KC_DLR'  : 'KC.DLR',
         'KC_PERC' : 'KC.PERC',
+        'KC_EXLM' : 'KC.EXLM',
+        'KC_CIRC' : 'KC.CIRC',
+        'KC_AMPR' : 'KC.AMP',
+        'KC_ASTR' : 'KC.AST',
+        'KC_PLUS' : 'KC.PLUS',
+        'KC_PIPE' : 'KC.PIPE',
+        'RGB_TOG' : 'KC.RGB_TOG',
+        'RGB_HUI' : 'KC.RGB_HUI',
+        'RGB_SAI' : 'KC.RGB_SAI',
+        'RGB_VAI' : 'KC.RGB_VAI',
+        'RGB_MOD' : 'KC.RGB_MODE_PLAIN',
+        'RGB_HUD' : 'KC.RGB_HUD',
+        'RGB_SAD' : 'KC.RGB_SAD',
+        'RGB_VAD' : 'KC.RGB_VAD',
+
     }
 
     def __init__(self, qmk_file, keyboard, debug=False):
@@ -190,6 +214,8 @@ class Translator:
                         # this lets us fill in our matrix if it is larger than 
                         # the map read in from qmk, fills holes with KC.NO
                         layer_list.append('XXXXXXX')
+                    elif key == -2:
+                        layer_list.append('_______')
                     else:
                         # where ther is a valid index in the json, put it in the
                         # correct place in the kmk keymap
@@ -235,6 +261,7 @@ class Translator:
         count = 0
         print('keyboard.keymap = [')
         for layer in self.keymap:
+            self.keyslot = len(max(layer, key=len))+3
             print(f'{self.tab}[')
             for idx,key in enumerate(layer):
                 if count <= self.keyboard.cols - 1:
@@ -251,4 +278,5 @@ class Translator:
 
 # usage - path to json file as the only argument
 if __name__ == '__main__':
-    translator = Translator(sys.argv[1], Atreus62()).parse()
+    #translator = Translator(sys.argv[1], Atreus62()).parse()
+    translator = Translator(sys.argv[1], Dactyl4x6()).parse()
