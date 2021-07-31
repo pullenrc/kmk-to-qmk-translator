@@ -26,6 +26,9 @@ class Atreus62:
     ]
 
 class Dactyl4x6:
+    #  there is no matching layout in qmk for this 4x6 dactyl,
+    #  unfortunately you have to go in and add the keys that populate 
+    #  as NO or TRNS
     rows = 4
     cols = 12
     matrix = [
@@ -39,6 +42,8 @@ class Layout:
         layout = { 
         'Atreus62' : Atreus62(),
         'Dactyl4x6' : Dactyl4x6()
+        
+        
     }
 
 class Translator:
