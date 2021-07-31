@@ -35,6 +35,12 @@ class Dactyl4x6:
         -2, -2, -2, 36, 37, 38, 39, 40, 41, -2, -2, -2
     ]
 
+class Layout:
+        layout = { 
+        'Atreus62' : Atreus62(),
+        'Dactyl4x6' : Dactyl4x6()
+    }
+
 class Translator:
     
     debug = False
@@ -276,7 +282,7 @@ class Translator:
             print(f'{self.tab}],')
         print(']')
 
-# usage - path to json file as the only argument
+# usage - path to json file, layout class desired
 if __name__ == '__main__':
-    #translator = Translator(sys.argv[1], Atreus62()).parse()
-    translator = Translator(sys.argv[1], Dactyl4x6()).parse()
+    #translator = Translator(sys.argv[1], Atreus62()).parse() # left here for notes or clues to somebody else
+    translator = Translator(sys.argv[1], Layout().layout[sys.argv[2]]).parse()
