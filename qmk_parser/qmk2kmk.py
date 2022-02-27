@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import sys
 import json
+import re
 
 class Atreus62:
     # A class should be created for each matrix type
@@ -38,12 +39,21 @@ class Dactyl4x6:
         -2, -2, -2, 36, 37, 38, 39, 40, 41, -2, -2, -2
     ]
 
+class Kyria:
+    rows = 4
+    cols = 16
+    matrix = [
+        0,  1,  2,  3,  4,  5,  -3, -3, -3, -3,  6,  7,  8,  9, 10, 11,
+        12, 13, 14, 15, 16, 17, -3, -3, -3, -3, 18, 19, 20, 21, 22, 23,
+        24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+        -3, -3, -3, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, -3, -3, -3,
+    ]
+
 class Layout:
         layout = { 
         'Atreus62' : Atreus62(),
-        'Dactyl4x6' : Dactyl4x6()
-        
-        
+        'Dactyl4x6' : Dactyl4x6(),
+        'Kyria' : Kyria(),
     }
 
 class Translator:
@@ -52,6 +62,8 @@ class Translator:
     keymap = []  
     keyslot = 12
     tab = '    '
+    EXTRACT_LONG_KEYS = True
+    extracted_keys = {}
     # this was a quick and dirty lookup dict that fit my purpouse for the
     # atreus62.  Please expand for your needs
     key_lookup = {
@@ -166,18 +178,37 @@ class Translator:
         'KC_PERC' : 'KC.PERC',
         'KC_EXLM' : 'KC.EXLM',
         'KC_CIRC' : 'KC.CIRC',
-        'KC_AMPR' : 'KC.AMP',
-        'KC_ASTR' : 'KC.AST',
+        'KC_AMPR' : 'KC.AMPR',
+        'KC_ASTR' : 'KC.ASTR',
         'KC_PLUS' : 'KC.PLUS',
         'KC_PIPE' : 'KC.PIPE',
         'RGB_TOG' : 'KC.RGB_TOG',
         'RGB_HUI' : 'KC.RGB_HUI',
         'RGB_SAI' : 'KC.RGB_SAI',
         'RGB_VAI' : 'KC.RGB_VAI',
-        'RGB_MOD' : 'KC.RGB_MODE_PLAIN',
+        'RGB_MOD' : 'KC.RGB_M_P', # cycle through modes, missing in KMK
+        'RGB_RMOD': 'KC.RGB_M_P', # cycle through modes in reverse, missing in KMK
         'RGB_HUD' : 'KC.RGB_HUD',
         'RGB_SAD' : 'KC.RGB_SAD',
         'RGB_VAD' : 'KC.RGB_VAD',
+        'KC_APP'  : 'KC.APP',
+        'KC_PGUP' : 'KC.PGUP',
+        'KC_HOME' : 'KC.HOME',
+        'KC_END'  : 'KC.END',
+        'KC_VOLU' : 'KC.VOLU',
+        'KC_VOLD' : 'KC.VOLD',
+        'KC_INS'  : 'KC.INS',
+        'KC_SLCK' : 'KC.SLCK',
+        'KC_PAUS' : 'KC.PAUS',
+        'KC_MPRV' : 'KC.MPRV',
+        'KC_MPLY' : 'KC.MPLY',
+        'KC_MNXT' : 'KC.MNXT',
+        'KC_MUTE' : 'KC.MUTE',
+        'KC_PSCR' : 'KC.PSCR',
+        'KC_COLN' : 'KC.COLN',
+        'KC_QUES' : 'KC.QUES',
+        'KC_QUOTE' : 'KC.QUOTE',
+        'KC_MINUS' : 'KC.MINUS',
 
     }
 
@@ -187,9 +218,15 @@ class Translator:
         self.debug = debug
 
     def parse_anykey(self, key):
-        newkey = key.split('(')
-        newkey = newkey[1].split(')')[0]
-        return newkey
+        m = re.match('^ANY\((\w+|MT\(MOD_(\w+), ?(\w+)\))\)$', key)
+        if m.group(2) and m.group(3): # Mod tap
+            value = f'KC.MT({self.key_lookup[m.group(3)]}, KC.{m.group(2)})'
+            if self.EXTRACT_LONG_KEYS:
+                name = f"{m.group(3).replace('KC_', '')}_{m.group(2)}"
+                self.extracted_keys[name] = value
+                return name
+            return value
+        return m.group(1)
 
     def parse_mo(self, key):
         return f'KC.MO({self.split_key(key)})'
@@ -227,6 +264,8 @@ class Translator:
                         layer_list.append('XXXXXXX')
                     elif key == -2:
                         layer_list.append('_______')
+                    elif key == -3:
+                        layer_list.append('#empty#')
                     else:
                         # where ther is a valid index in the json, put it in the
                         # correct place in the kmk keymap
@@ -252,7 +291,7 @@ class Translator:
                                 )
                         elif 'DF(' in data['layers'][layer][key]:
                             layer_list.append(
-                                self.parse_tf(data['layers'][layer][key])
+                                self.parse_df(data['layers'][layer][key])
                                 )
                         else:
                             layer_list.append(
@@ -268,6 +307,9 @@ class Translator:
     # this just prints out the new keymap in a format that can be pasted into 
     # our main.py.  the final product isnt pretty yet, but usable
     def translate(self):
+        if self.EXTRACT_LONG_KEYS:
+            for name, key in self.extracted_keys.items():
+                print(f'{name} = {key}')
         line = ''
         count = 0
         print('keyboard.keymap = [')
@@ -276,7 +318,11 @@ class Translator:
             print(f'{self.tab}[')
             for idx,key in enumerate(layer):
                 if count <= self.keyboard.cols - 1:
-                    line += f'{key}, '
+                    if key == '#empty#':
+                        key = ''
+                        line += '  '
+                    else:
+                        line += f'{key}, '
                     for s in range(self.keyslot-len(key)):
                         line += ' '
                     count += 1
